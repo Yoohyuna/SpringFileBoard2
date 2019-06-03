@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context" 
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+       
+<!-- @Autowired 사용을 위해 -->
+    <context:annotation-config/> 
+    
+    <!-- 컨트롤러 자동스캔
+      <context:component-scan base-package="com.board" /> 컨트롤러 클래스를 일일이 작성
+                                                                                          하지 않아도 된다.
+      -->
+    
+    <bean class="com.board.dao.BoardDaoImpl" />
+    <bean class="com.board.controller.ListController" />
+    <bean class="com.board.controller.WriterController" />
+ 
+    <!-- tiles (ViewResolver)설정 -->
+    <bean id="tilesConfigurer" 
+      class="org.springframework.web.servlet.view.tiles3.TilesConfigurer">
+        <property name="definitions">
+            <list>
+                <value>/WEB-INF/tiles-def/tilesdef.xml</value>
+            </list>
+        </property>
+    </bean>
+    
+    <bean id="viewResolver" 
+     class="org.springframework.web.servlet.view.UrlBasedViewResolver">
+        <property name="viewClass"
+         value="org.springframework.web.servlet.view.tiles3.TilesView"/>
+        <property name="order" value="1"/>
+    </bean>
+    
+    <!-- 리소스번들파일을 불러오는 환경설정
+           리소스번들파일 ->웹상에서 필요로하는 문자열이나 유효성검사에 관련된 부분을 불러올 수 있도록
+                             파일
+          messages(패키지명).label(불러올 파일명)~.properties이 생략                   
+     -->
+    <bean id="messageSource" 
+        class="org.springframework.context.support.ResourceBundleMessageSource">
+        <property name="basenames">
+	        <list>
+	            <value>messages.label</value>
+	            <value>messages.validation</value>
+	        </list>
+        </property>
+        <!-- <property name="defaultEncoding" value="utf-8" /> -->
+    </bean>
+    
+    <!-- 예외페이지 작성
+           SimpleMappingExceptionResolver->웹상에서 에러가 발생->개발자가 작성한 예외처리
+                                                              페이지를 보여주게 설정이 가능하다.
+            <prop key="java.lang.Exception(발생한 예외처리클래스명)">예외처리페이지명</prop>                                                  
+        -->
+    <bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+        <property name="exceptionMappings">
+            <props>
+                <prop key="java.lang.Exception">pageError</prop>
+            </props>
+        </property>
+    </bean>
+    
+    <!-- 파일업로드(52428800(byte 단위) 50MB->51,200kb->52,428,800 byte 
+           CommonMultipartResolver 업로드 관여 클래스 빈즈 등록
+           maxUploadSize(최대업로드크기지정)
+           defaultEncoding(한글처리부분설정)
+            ctrl키누르면서 마우스를 갖다대면 클래스명이 링크가 걸려있으면 오타X
+     -->
+    <bean id="multipartResolver" 
+               class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+       <property name="maxUploadSize" value="52428800" />   
+       <property name="defaultEncoding" value="utf-8" />     
+   </bean>
+    
+</beans>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

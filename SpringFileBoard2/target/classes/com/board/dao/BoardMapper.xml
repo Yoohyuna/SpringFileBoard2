@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="board">
+ 
+ <!--1.springboard2 테이블에서 SQL작업(1.글목록보기) -->
+<select  id="selectList"  parameterType="map"  resultType="BoardCommand"  >
+    select seq,writer,title,content,pwd,hit,regdate,filename
+            from ( select a.*, rownum rnum
+                from (select * from springboard2
+                   <where>
+                     <if test="keyWord!=null and keyField=='title'">
+                            title like '%' || #{keyWord} || '%'
+                     </if>
+                     <if test="keyWord!=null and keyField=='writer'">
+                             writer like '%' || #{keyWord} || '%'
+                     </if>
+                     <if test="keyWord!=null and keyField=='content'">
+                            content like '%' || #{keyWord} || '%'
+                     </if>
+                     <if test="keyWord!=null and keyField=='all'">
+                            title like '%' || #{keyWord} || '%'  or
+                            writer like '%' || #{keyWord} || '%'  or
+                            content like '%' || #{keyWord} || '%'
+                     </if>
+                   </where>        
+                     order by seq desc)a)
+  <![CDATA[
+    where rnum >=#{start} AND rnum <=#{end}
+    ]]>
+</select>
+
+<!--2.검색어에 해당하는 총레코드수 구하기 java.lang.Integer->Integer->int-->
+ <select id="selectCount" parameterType="map" resultType="Integer">
+    select count(*) from springboard2
+                <where>
+                     <if test="keyWord!=null and keyField=='title'">
+                            title like '%' || #{keyWord} || '%'
+                     </if>
+                     <if test="keyWord!=null and keyField=='writer'">
+                            writer like '%' || #{keyWord} || '%'
+                     </if>
+                     <if test="keyWord!=null and keyField=='content'">
+                            content like '%' || #{keyWord} || '%'
+                     </if>
+                     <if test="keyWord!=null and keyField=='all'">
+                            title like '%' || #{keyWord} || '%'  or
+                            writer like '%' || #{keyWord} || '%'  or
+                            content like '%' || #{keyWord} || '%'
+                     </if>
+                 </where>
+ </select>
+ 
+ <!-- 최대값 구하기 -->
+ <select id="getNewSeq" resultType="int" >
+    select max(seq) from springboard2
+ </select>
+ 
+ <!--3.글쓰기(sysdate, mysql(now())  com.board.domain.BoardCommand
+    #{매개변수명(=테이블의 필드명=멤버변수명}=>Getter Method호출하는 문장이다. 
+   -->
+ <insert id="insertBoard" parameterType="BoardCommand">
+     insert into springboard2(seq,writer,title,content,pwd,hit,regdate,filename)
+     values(#{seq},#{writer},#{title},#{content},#{pwd},0,sysdate,
+     #{filename,jdbcType=VARCHAR})
+ </insert>
+ 
+ <!--4.조회수 증가하기 java.lang.String=>String->string(X) -->
+ <!-- <update id="upda
+ teReadcnt" parameterType="String" >
+    update springboard set readcnt=readcnt+1 where num=#{num}
+ </update>
+ 
+ 5. 게시물번호에 따른 레코드 상세보기
+ <select id="retrieve" parameterType="String"  resultType="board">
+     select * from springboard where num=#{num}
+ </select>
+ 
+ 6.글삭제하기 
+ <delete id="delete" parameterType="String">
+    delete from springboard where num=#{num}
+ </delete>
+ 
+ 7.글수정하기 
+ <update id="update" parameterType="board">
+    update springboard set title=#{title} ,content=#{content},author=#{author}
+    where num=#{num}
+ </update>
+ 
+ 8.글검색하기 
+ <select id="search" parameterType="board"  resultType="board">
+     select * from springboard where ${searchName} like '%${searchValue}%'
+     order by num desc
+ </select> -->
+ 
+</mapper>
+
+
+
